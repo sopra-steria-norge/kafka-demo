@@ -1,0 +1,22 @@
+version: "3.5"
+
+networks:
+  confluent:
+    name: confluent
+    external: true
+
+services:
+  f1-1:
+    build:
+        context: .
+        dockerfile: Dockerfile.f1
+    image: f1
+    hostname: f1-1
+    container_name: f1-1
+    networks:
+        - confluent
+    environment:
+        F1_CONSUMER__BOOTSTRAP_SERVERS: broker:9094
+        F1_CONSUMER__SCHEMA_REGISTRY_URL: http://schema-registry:8081
+        F1_PRODUCER__BOOTSTRAP_SERVERS: broker:9094
+        F1_PRODUCER__SCHEMA_REGISTRY_URL: http://schema-registry:8081

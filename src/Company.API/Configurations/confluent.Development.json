@@ -1,0 +1,6 @@
+{
+    "ConfluentCluster": {
+        "BrokerUrl": "localhost:9092",
+        "SchemaRegistryUrl": "http://localhost:8081"
+    }
+}

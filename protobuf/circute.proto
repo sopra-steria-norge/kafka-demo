@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Circuit";
+
+message CircuitInfo {
+    repeated TrackMarkers Corners = 1;
+    repeated TrackMarkers MarshalLights = 2;
+    repeated TrackMarkers MarshalSectors = 3;
+    float Rotation = 4;
+}
+
+message TrackMarkers {
+    float X = 1;
+    float Y = 2;
+    int64 Number = 3;
+    string Letter = 4;
+    float Angle = 5;
+    float Distance = 6;
+}

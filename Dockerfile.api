@@ -1,0 +1,45 @@
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+
+WORKDIR /source
+
+RUN apt-get -y update \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y upgrade \
+    && apt-get -y install --no-install-recommends wget \
+    && wget -qO- https://aka.ms/install-artifacts-credprovider.sh | bash
+
+# copy csproj and restore as distinct layers
+COPY kafka-demo.sln .
+
+COPY Directory.Build.props .
+COPY Directory.Packages.props .
+
+COPY src/Company.API/*.csproj ./src/Company.API/
+COPY src/Company.API.Application/*.csproj ./src/Company.API.Application/
+
+COPY tests/IntegrationTests/Company.API.IntegrationTests/*.csproj ./tests/IntegrationTests/Company.API.IntegrationTests/
+COPY tests/UnitTests/Company.API.Application.UnitTests/*.csproj ./tests/UnitTests/Company.API.Application.UnitTests/
+
+RUN dotnet restore kafka-demo.sln
+
+# copy everything else and build app
+COPY . /source/
+
+ARG VERSION
+RUN dotnet publish -c release -o /app src/Company.API/
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
+
+WORKDIR /app
+
+# Add new user so we dont run as root
+RUN groupadd -r company && useradd -g company company
+USER company
+
+COPY --from=build /app ./
+
+ENV ASPNETCORE_URLS="http://+:8080"
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "Company.API.dll"]

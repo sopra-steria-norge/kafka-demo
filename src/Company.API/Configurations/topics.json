@@ -1,0 +1,34 @@
+{
+    "TopicConfigurations": [
+        {
+            "Name": "f1.session-request.event.proto.v1",
+            "TopicCreationConfig": {
+                "NumPartitions": 2
+            },
+            "TopicAlterConfig": {
+                "CleanupPolicy": "delete",
+                "RetentionMs": 604800000
+            }
+        },
+        {
+            "Name": "f1.session-request-status.event.proto.v1",
+            "TopicCreationConfig": {
+                "NumPartitions": 2
+            },
+            "TopicAlterConfig": {
+                "CleanupPolicy": "delete",
+                "RetentionMs": 604800000
+            }
+        },
+        {
+            "Name": "api.long-operations.data.proto.v1",
+            "TopicCreationConfig": {
+                "NumPartitions": 4
+            },
+            "TopicAlterConfig": {
+                "CleanupPolicy": "compact",
+                "RetentionMs": 2629746000
+            }
+        }
+    ]
+}

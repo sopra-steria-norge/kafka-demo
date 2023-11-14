@@ -1,0 +1,13 @@
+{
+    "Telemetry": {
+        "Enabled": true,
+        "Console": true,
+        "Otlp": {
+            "Enabled": false,
+            "Url": "http://localhost:1887"
+        },
+        "Azure": {
+            "Enabled": false
+        }
+    }
+}

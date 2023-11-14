@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.AppStatus";
+
+import "google/protobuf/timestamp.proto";
+
+enum AppStatus {
+    OK = 0;
+    ERROR = 1;
+}
+
+message Heartbeat {
+    string name = 1;
+    AppStatus status = 2;
+    google.protobuf.Timestamp time = 3;
+}

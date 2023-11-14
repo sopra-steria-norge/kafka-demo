@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Session";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message Laps {
+    google.protobuf.Duration Time = 1;
+    string Driver = 2;
+    string DriverNumber = 3;
+    google.protobuf.Duration LapTime = 4;
+    float LapNumber = 5;
+    float Stint = 6;
+    google.protobuf.Duration PitOutTime = 7;
+    google.protobuf.Duration PitInTime = 8;
+    google.protobuf.Duration Sector1Time = 9;
+    google.protobuf.Duration Sector2Time = 10;
+    google.protobuf.Duration Sector3Time = 11;
+    google.protobuf.Duration Sector1SessionTime = 12;
+    google.protobuf.Duration Sector2SessionTime = 13;
+    google.protobuf.Duration Sector3SessionTime = 14;
+    float SpeedI1 = 15;
+    float SpeedI2 = 16;
+    float SpeedFL = 17;
+    float SpeedST = 18;
+    bool IsPersonalBest = 19;
+    string Compound = 20;
+    float TyreLife = 21;
+    bool FreshTyre = 22;
+    string Team = 23;
+    google.protobuf.Duration LapStartTime = 24;
+    google.protobuf.Timestamp LapStartDate = 25;
+    string TrackStatus = 26;
+    float Position = 27;
+    bool Deleted = 28;
+    string DeletedReason = 29;
+    bool FastF1Generated = 30;
+    bool IsAccurate = 31;
+}
+
+message CarData {
+    google.protobuf.Timestamp Date = 1;
+    int64 RPM = 2;
+    int64 Speed = 3;
+    int64 nGear = 4;
+    int64 Throttle = 5;
+    bool Brake = 6;
+    int64 DRS = 7;
+    string Source = 8;
+    google.protobuf.Duration Time = 9;
+    google.protobuf.Duration SessionTime = 10;
+    string DrvierNumber = 11;
+}
+
+message WeatherData {
+    google.protobuf.Duration Time = 1;
+    float AirTemp = 2;
+    float Humidity = 3;
+    float Pressure = 4;
+    bool Rainfall = 5;
+    float TrackTemp = 6;
+    int64 WindDirection = 7;
+    float WindSpeed = 8;
+}
+
+message PositionData {
+    google.protobuf.Timestamp Date = 1;
+    string Status = 2;
+    int64 X = 3;
+    int64 Y = 4;
+    int64 Z = 5;
+    string Source = 6;
+    google.protobuf.Duration Time = 7;
+    google.protobuf.Duration SessionTime = 8;
+    string DriverNumber = 9;
+}
+
+message SessionStatus {
+    google.protobuf.Duration Time = 1;
+    string Status = 2;
+}
+
+message TrackStatus {
+    google.protobuf.Duration Time = 1;
+    string Status = 2;
+    string Message = 3;
+}
+
+message RaceControlMessages {
+    google.protobuf.Timestamp Time = 1;
+    string Category = 2;
+    string Message = 3;
+    string Status = 4;
+    string Flag = 5;
+    string Scope = 6;
+    float Sector = 7;
+    string RacingNumber = 8;
+}

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Request";
+
+import "google/protobuf/timestamp.proto";
+
+enum Identifiers {
+    RACE = 0;
+    QUALIFYING = 1;
+    SPRINT = 2;
+    SPRINT_QUALIFYING = 3;
+    SPRINT_SHOOTOUT = 4;
+    PRACTICE_1 = 5;
+    PRACTICE_2 = 6;
+    PRACTICE_3 = 7;
+}
+
+enum Status {
+    SENDT = 0;
+    RECIVED = 1;
+    STARTED = 2;
+    COMPLETED = 3;
+    SIMULATING = 4;
+}
+
+message RequestSession {
+    int64 Year = 1;
+    int64 GrandPrix = 2;
+    Identifiers Identifier = 3;
+    bool PositionData = 4;
+    bool CarData = 5;
+}
+
+message SessionStatusResponse {
+    google.protobuf.Timestamp Time = 1;
+    Status Status = 2;
+}

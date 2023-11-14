@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "f1"
+version = "0.1.0"
+description = ""
+authors = ["Idar Bergli <idar.bergli@soprasteria.com>"]
+readme = "README.md"
+packages = [
+    { include = "f1", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastf1 = "^3.1.4"
+fastapi = "^0.104.1"
+protobuf = "^4.25.0"
+aiokafka = "^0.8.1"
+uvicorn = "^0.24.0"
+uvloop = "^0.19.0"
+confluent-kafka = "^2.3.0"
+cloudevents = "^1.10.1"
+pydantic-settings = "^2.0.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
