@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Session";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message CarData {
+    google.protobuf.Timestamp Date = 1;
+    int64 RPM = 2;
+    int64 Speed = 3;
+    int64 nGear = 4;
+    int64 Throttle = 5;
+    bool Brake = 6;
+    int64 DRS = 7;
+    string Source = 8;
+    google.protobuf.Duration Time = 9;
+    google.protobuf.Duration SessionTime = 10;
+    string DrvierNumber = 11;
+}

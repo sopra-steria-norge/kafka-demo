@@ -79,7 +79,7 @@ public sealed class LongRunningOperationHandler
         CancellationToken cancellationToken
     )
     {
-        if (_cache.TryGetValue(request.OperationId, out var cacheResult))
+        if (_cache.TryGetValue(request.OperationId.ToString(), out var cacheResult))
         {
             if (cacheResult is not null)
                 return (LongOperationResponse)cacheResult!;
@@ -136,7 +136,7 @@ public sealed class LongRunningOperationHandler
                         }
 
                         response = new LongOperationResponse(data.Time.ToDateTime(), data.Status);
-                        _cache.Set(request.OperationId, response, cacheOption);
+                        _cache.Set(request.OperationId.ToString(), response, cacheOption);
                     }
                 }
                 catch (OperationCanceledException)

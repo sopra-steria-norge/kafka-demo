@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Session";
+
+import "google/protobuf/timestamp.proto";
+
+message RaceControlMessages {
+    google.protobuf.Timestamp Time = 1;
+    string Category = 2;
+    string Message = 3;
+    string Status = 4;
+    string Flag = 5;
+    string Scope = 6;
+    float Sector = 7;
+    string RacingNumber = 8;
+}

@@ -69,7 +69,7 @@ app.UseSwagger(c => c.RouteTemplate = "docs/{documentname}/swagger.json");
 app.UseValidationExceptionHandler();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Test"))
 {
     app.UseSwaggerUI(c =>
     {
@@ -84,6 +84,7 @@ else if (app.Environment.IsProduction())
         c.SwaggerEndpoint("/docs/v1/swagger.json", "v1");
         c.SupportedSubmitMethods();
         c.RoutePrefix = "docs";
+        c.EnableTryItOutByDefault();
     });
 }
 

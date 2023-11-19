@@ -9,7 +9,7 @@ from typing import Any, LiteralString, Generator, Callable
 import pandas
 import fastf1
 import pandas as pd
-from fastf1.core import Session
+from fastf1.core import Session, DataNotLoadedError
 from pandas import DataFrame, Series
 from cloudevents.abstract import AnyCloudEvent
 from confluent_kafka.serialization import SerializationContext, MessageField
@@ -23,9 +23,14 @@ from google.protobuf import timestamp_pb2, duration_pb2
 from google.protobuf.internal.well_known_types import Duration, Timestamp
 from f1.protobuf.request_pb2 import SessionStatusResponse, RECIVED, STARTED, COMPLETED
 from f1.protobuf.circute_pb2 import TrackMarkers, CircuitInfo
-from f1.protobuf.session_pb2 import (RaceControlMessages, TrackStatus,
-                                     SessionStatus, PositionData, WeatherData,
-                                     CarData, Laps)
+from f1.protobuf.car_data_pb2 import CarData
+from f1.protobuf.laps_pb2 import Laps
+from f1.protobuf.position_data_pb2 import PositionData
+from f1.protobuf.race_control_messages_pb2 import RaceControlMessages
+from f1.protobuf.session_status_pb2 import SessionStatus
+from f1.protobuf.track_status_pb2 import TrackStatus
+from f1.protobuf.weather_data_pb2 import WeatherData
+
 from f1.protobuf.request_pb2 import (RequestSession, RACE, QUALIFYING, SPRINT,
                                      SPRINT_QUALIFYING, SPRINT_SHOOTOUT,
                                      PRACTICE_1, PRACTICE_2, PRACTICE_3)
@@ -116,85 +121,118 @@ class Formula1Sessions:
 
         circute_info = self._loop.create_task(self._produce_circute_information())
 
-        laps = self._loop.create_task(
-            self._produce_from_dataframe(
-                "laps",
-                self._session.laps,
-                "f1.laps.event.proto.v1",
-                Laps,
-                self._generate_laps_events
+        laps = asyncio.Future()
+        try:
+            laps = self._loop.create_task(
+                self._produce_from_dataframe(
+                    "laps",
+                    self._session.laps,
+                    "f1.laps.event.proto.v1",
+                    Laps,
+                    self._generate_laps_events
+                )
             )
-        )
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            laps.set_result(None)
 
-        # Only generate car data if requested. As this takes time.
         car_data = asyncio.Future()
-        if cmd.CarData:
-            car_data = self._loop.create_task(
+        try:
+            # Only generate car data if requested. As this takes time.
+            if cmd.CarData:
+                car_data = self._loop.create_task(
+                    self._produce_from_dataframe(
+                        "car data",
+                        self._session.car_data,
+                        "f1.car.data.proto.v1",
+                        CarData,
+                        self._generate_car_data_events
+                    )
+                )
+            else:
+                car_data.set_result(True)
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            car_data.set_result(None)
+
+        weather_data = asyncio.Future()
+        try:
+            weather_data = self._loop.create_task(
                 self._produce_from_dataframe(
-                    "car data",
-                    self._session.car_data,
-                    "f1.car.data.proto.v1",
-                    CarData,
-                    self._generate_car_data_events
+                    "weather data",
+                    self._session.weather_data,
+                    "f1.weather.data.proto.v1",
+                    WeatherData,
+                    self._generate_weather_data_events
                 )
             )
-        else:
-            car_data.set_result(True)
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            weather_data.set_result(None)
 
-        weather_data = self._loop.create_task(
-            self._produce_from_dataframe(
-                "weather data",
-                self._session.weather_data,
-                "f1.weather.data.proto.v1",
-                WeatherData,
-                self._generate_weather_data_events
-            )
-        )
-
-        # Only generate position data if requested. As this takes time.
         pos_data = asyncio.Future()
-        if cmd.PositionData:
-            pos_data = track_status = self._loop.create_task(
+        try:
+            # Only generate position data if requested. As this takes time.
+            if cmd.PositionData:
+                pos_data = track_status = self._loop.create_task(
+                    self._produce_from_dataframe(
+                        "position data",
+                        self._session.pos_data,
+                        "f1.position.data.proto.v1",
+                        PositionData,
+                        self._generate_position_data_events
+                    )
+                )
+            else:
+                pos_data.set_result(True)
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            pos_data.set_result(None)
+
+        session_status = asyncio.Future()
+        try:
+            session_status = track_status = self._loop.create_task(
                 self._produce_from_dataframe(
-                    "position data",
-                    self._session.pos_data,
-                    "f1.position.data.proto.v1",
-                    PositionData,
-                    self._generate_position_data_events
+                    "session status",
+                    self._session.session_status,
+                    "f1.session-status.event.proto.v1",
+                    SessionStatus,
+                    self._generate_session_status_events
                 )
             )
-        else:
-            pos_data.set_result(True)
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            session_status.set_result(None)
 
-        session_status = track_status = self._loop.create_task(
-            self._produce_from_dataframe(
-                "session status",
-                self._session.session_status,
-                "f1.session-status.event.proto.v1",
-                SessionStatus,
-                self._generate_session_status_events
+        track_status = asyncio.Future()
+        try:
+            track_status = self._loop.create_task(
+                self._produce_from_dataframe(
+                    "track status",
+                    self._session.track_status,
+                    "f1.track-status.event.proto.v1",
+                    TrackStatus,
+                    self._generate_track_status_events
+                )
             )
-        )
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            track_status.set_result(None)
 
-        track_status = self._loop.create_task(
-            self._produce_from_dataframe(
-                "track status",
-                self._session.track_status,
-                "f1.track-status.event.proto.v1",
-                TrackStatus,
-                self._generate_track_status_events
+        race_control_msg = asyncio.Future()
+        try:
+            race_control_msg = self._loop.create_task(
+                self._produce_from_dataframe(
+                    "race control messages",
+                    self._session.race_control_messages,
+                    "f1.race-control-messages.event.proto.v1",
+                    RaceControlMessages,
+                    self._generate_race_control_message_events
+                )
             )
-        )
-
-        race_control_msg = self._loop.create_task(
-            self._produce_from_dataframe(
-                "race control messages",
-                self._session.race_control_messages,
-                "f1.race-control-messages.event.proto.v1",
-                RaceControlMessages,
-                self._generate_race_control_message_events
-            )
-        )
+        except DataNotLoadedError as e:
+            log.exception("Data not loaded", exc_info=e)
+            race_control_msg.set_result(None)
 
         async def trigger_fut():
             """ Innline pricate async function to handle the waiting for all started
@@ -327,13 +365,13 @@ class Formula1Sessions:
                 self._schema_registry_client,
                 {'use.deprecated.format': False}
             )
-
+            start = time.time()
             for key, msg in message_generator(df):
                 if self._stopping.cancelled():
                     log.info("Sessions cancled stopp processing %s", name)
                     break
 
-                if len(producer_tasks) >= 20:
+                if len(producer_tasks) >= 200:
                     await self._wait_for_tasks(producer_tasks)
                     producer_tasks.clear()
 
@@ -357,7 +395,9 @@ class Formula1Sessions:
                 await asyncio.sleep(0.001)
                 sendt += 1
                 if (sendt % 1000) == 0:
-                    log.info("%s sentd %s records", name, sendt)
+                    end = time.time()
+                    log.info("%s sentd %s records in %s seconds", name, sendt, end-start)
+                    start = time.time()
 
             await self._wait_for_tasks(producer_tasks)
             producer_tasks.clear()

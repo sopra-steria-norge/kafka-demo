@@ -6,7 +6,7 @@ public sealed record SessionOptions
 {
     public const string SectionName = "Session";
 
-    public int SessionMinimumYear { get; init; } = 1950;
+    public int SessionMinimumYear { get; init; } = 2019;
 
     public int SessionMaximumYear { get; init; } = DateTime.UtcNow.Year;
 }

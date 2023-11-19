@@ -32,6 +32,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConsumerFactory>(x => x.GetRequiredService<ConfluentFactory>());
         services.AddSingleton<IAdminFactory>(x => x.GetRequiredService<ConfluentFactory>());
 
+        services.AddSingleton<IMemoryOperationStorage, MemoryOperationStorage>();
+
         return services;
     }
 }

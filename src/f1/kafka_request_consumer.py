@@ -32,6 +32,7 @@ class RequestConsumer:
         self._assigned_partitions: dict[int, TopicPartition] = {}
         self._paused = False
         self._record: Message | None = None
+        self._cloud_event: AnyCloudEvent | None = None
 
     @property
     def running(self):
@@ -76,17 +77,17 @@ class RequestConsumer:
                                                         SerializationContext(self._config.TOPIC,
                                                                              MessageField.VALUE))
 
-                cloud_event = self._create_cloud_event(record.headers())
+                self._cloud_event = self._create_cloud_event(record.headers())
 
                 if session_request is not None:
-                    self._cmd_handler_fut = await command_handler(session_request, cloud_event)
+                    self._cmd_handler_fut = await command_handler(session_request, self._cloud_event)
                     self._cmd_handler_fut.add_done_callback(self._on_future_done_commit)
                     partition = TopicPartition(record.topic(), partition=record.partition(), offset=record.offset())
                     self._assigned_partitions[record.partition()] = partition
                     self._record = record
 
                 if self._cmd_handler_fut and not self._cmd_handler_fut.done():
-                    log.info("Pause request consuming until %s is done", cloud_event.get("correlationid"))
+                    log.info("Pause request consuming until %s is done", self._cloud_event.get("correlationid"))
                     self._consumer.pause([*self._assigned_partitions.values()])
                     self._paused = True
 
@@ -105,9 +106,15 @@ class RequestConsumer:
         if not self._running:
             return
 
-        log.debug("Commiting partition %s with offset %s", self._record.partition(), self._record.offset())
+        log.info("Commiting partition %s with offset %s and correlation id %s",
+                  self._record.partition(),
+                  self._record.offset(),
+                  self._cloud_event.get("correlationid")
+        )
+
         self._consumer.commit(self._record)
         self._record = None
+        self._cloud_event = None
         log.info("Resume request processing")
         self._consumer.resume([*self._assigned_partitions.values()])
 

@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using Confluent.Kafka;
 using CloudNative.CloudEvents;
 
+using Company.API.Application.Infrastructure;
+
 namespace Company.API.Application.Features.Session;
 
 /// <summary>
@@ -84,11 +86,17 @@ public sealed class SessionHandler : IRequestHandler<SessionRequest, ErrorOr<Ses
 {
     private readonly ILogger<SessionHandler> _logger;
     private readonly IProducerFactory _producerFactory;
+    private readonly IMemoryOperationStorage _operationStorage;
 
-    public SessionHandler(ILogger<SessionHandler> logger, IProducerFactory producerFactory)
+    public SessionHandler(
+        ILogger<SessionHandler> logger,
+        IProducerFactory producerFactory,
+        IMemoryOperationStorage operationStorage
+    )
     {
         _logger = logger;
         _producerFactory = producerFactory;
+        _operationStorage = operationStorage;
     }
 
     public async Task<ErrorOr<SessionResponse>> Handle(
@@ -100,6 +108,8 @@ public sealed class SessionHandler : IRequestHandler<SessionRequest, ErrorOr<Ses
 
         await ProduceStatus(correlationId, cancellationToken);
         await ProduceRequest(request, correlationId, cancellationToken);
+
+        _operationStorage.AddOperationId(correlationId.ToString());
 
         return new SessionResponse(correlationId);
     }

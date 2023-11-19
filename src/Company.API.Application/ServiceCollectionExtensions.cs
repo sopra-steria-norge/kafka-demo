@@ -1,6 +1,6 @@
+using Company.API.Application.Features.LongRunningOperations;
 using Company.API.Application.Features.Session;
 using Company.API.Application.Infrastructure;
-using Company.API.Application.Infrastructure.Producer;
 
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
@@ -41,6 +41,7 @@ public static class ServiceCollectionExtensions
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
+        services.AddHostedService<BackgroundStatusWorker>();
         services.AddSchemaRegistry(config);
         services.AddConfluentFactory();
 

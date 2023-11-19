@@ -6,7 +6,7 @@ networks:
     external: true
 
 services:
-  f1-1:
+  f1-api:
     build:
         context: .
         dockerfile: Dockerfile.api
@@ -20,3 +20,4 @@ services:
     environment:
         F1_CONSUMER__BOOTSTRAP_SERVERS: broker:9094
         F1_CONSUMER__SCHEMA_REGISTRY_URL: http://schema-registry:8081
+        ASPNETCORE_ENVIRONMENT: Test

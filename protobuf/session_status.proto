@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Session";
+
+import "google/protobuf/duration.proto";
+
+
+message SessionStatus {
+    google.protobuf.Duration Time = 1;
+    string Status = 2;
+}

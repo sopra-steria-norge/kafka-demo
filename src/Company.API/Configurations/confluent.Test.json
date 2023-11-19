@@ -1,0 +1,6 @@
+{
+    "ConfluentCluster": {
+        "BrokerUrl": "broker:9094",
+        "SchemaRegistryUrl": "http://schema-registry:8081"
+    }
+}

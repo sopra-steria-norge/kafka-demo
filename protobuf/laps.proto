@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Session";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message Laps {
+    google.protobuf.Duration Time = 1;
+    string Driver = 2;
+    string DriverNumber = 3;
+    google.protobuf.Duration LapTime = 4;
+    float LapNumber = 5;
+    float Stint = 6;
+    google.protobuf.Duration PitOutTime = 7;
+    google.protobuf.Duration PitInTime = 8;
+    google.protobuf.Duration Sector1Time = 9;
+    google.protobuf.Duration Sector2Time = 10;
+    google.protobuf.Duration Sector3Time = 11;
+    google.protobuf.Duration Sector1SessionTime = 12;
+    google.protobuf.Duration Sector2SessionTime = 13;
+    google.protobuf.Duration Sector3SessionTime = 14;
+    float SpeedI1 = 15;
+    float SpeedI2 = 16;
+    float SpeedFL = 17;
+    float SpeedST = 18;
+    bool IsPersonalBest = 19;
+    string Compound = 20;
+    float TyreLife = 21;
+    bool FreshTyre = 22;
+    string Team = 23;
+    google.protobuf.Duration LapStartTime = 24;
+    google.protobuf.Timestamp LapStartDate = 25;
+    string TrackStatus = 26;
+    float Position = 27;
+    bool Deleted = 28;
+    string DeletedReason = 29;
+    bool FastF1Generated = 30;
+    bool IsAccurate = 31;
+}

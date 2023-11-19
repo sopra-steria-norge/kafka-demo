@@ -26,7 +26,7 @@ RUN dotnet restore kafka-demo.sln
 COPY . /source/
 
 ARG VERSION
-RUN dotnet publish -c release -o /app src/Company.API/
+RUN dotnet publish -c Debug /p:EnvironmentName=Development -o /app src/Company.API/
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0

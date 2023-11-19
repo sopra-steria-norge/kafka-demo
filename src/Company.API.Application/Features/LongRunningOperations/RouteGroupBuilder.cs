@@ -1,3 +1,5 @@
+using Company.API.Application.Infrastructure;
+
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +34,22 @@ public static class RouteGroupBuilderExtensions
                         Summary = "Retrive Long Operation status",
                         Description =
                             "Retrive the status of and long operation that has been started"
+                    }
+            );
+
+        group
+            .MapGet(
+                "/",
+                ([FromServices] IMemoryOperationStorage storage) => storage.GetOperationIds()
+            )
+            .WithName("LongOperations")
+            .Produces<List<Guid>>()
+            .WithOpenApi(
+                operation =>
+                    new(operation)
+                    {
+                        Summary = "Retrive all operations",
+                        Description = "Retrive all operations that has been started by the API"
                     }
             );
 

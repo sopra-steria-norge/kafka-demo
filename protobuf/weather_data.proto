@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package company.proto.formula1;
+
+option csharp_namespace = "Company.Proto.Formula1.Session";
+
+import "google/protobuf/duration.proto";
+
+message WeatherData {
+    google.protobuf.Duration Time = 1;
+    float AirTemp = 2;
+    float Humidity = 3;
+    float Pressure = 4;
+    bool Rainfall = 5;
+    float TrackTemp = 6;
+    int64 WindDirection = 7;
+    float WindSpeed = 8;
+}
