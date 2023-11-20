@@ -12,8 +12,6 @@ services:
     container_name: broker
     networks:
       - confluent
-    depends_on:
-      - zookeeper
     ports:
       - "9092:9092"
       - "9101:9101"
